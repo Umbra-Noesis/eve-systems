@@ -217,6 +217,34 @@
             box-shadow: 0 0 16px rgba(185,115,51,0.4);
         }
 
+        /* ── Preview gallery ── */
+        #gallery {
+            display: none; position: fixed; inset: 0; z-index: 190;
+            background: rgba(0,0,0,0.97);
+            overflow-y: auto;
+        }
+        #gallery.open { display: block; }
+        #gallery-inner { max-width: 76rem; margin: 0 auto; padding: 4.5rem 1.5rem 4rem; }
+        .gallery-group-label {
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
+            margin: 2.5rem 0 1.25rem;
+        }
+        .gallery-group-label:first-child { margin-top: 0; }
+        .gallery-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1rem;
+        }
+        .gallery-thumb {
+            position: relative; border-radius: 0.6rem; overflow: hidden; cursor: zoom-in;
+            border: 1px solid rgba(185,115,51,0.2); background: #000;
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+        .gallery-thumb:hover { border-color: rgba(185,115,51,0.55); transform: translateY(-2px); }
+        .gallery-thumb img { width: 100%; display: block; }
+        .gallery-caption {
+            font-size: 0.68rem; color: #64748B; padding: 0.5rem 0.15rem 0;
+        }
+
         /* ── Step numbers ── */
         .step-num {
             height: 2rem; width: 2rem; border-radius: 0.5rem; flex-shrink: 0;
@@ -326,11 +354,11 @@
             <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap items-center gap-x-8 gap-y-2">
                 <div class="flex items-center gap-2">
                     <span class="pulse-dot"></span>
-                    <span class="text-xs font-semibold" style="color: #F8FAFC;">EVAA Live — Linux</span>
+                    <span class="text-xs font-semibold" style="color: #F8FAFC;">EVAA — Pre-Release, secured for in-house use</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-microchip text-copper" style="font-size: 0.7rem;"></i>
-                    <span class="text-xs" style="color: #64748B;">3 AI models included</span>
+                    <span class="text-xs" style="color: #64748B;">6 local AI models included</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <i class="fa-solid fa-microphone text-copper" style="font-size: 0.7rem;"></i>
@@ -351,7 +379,7 @@
                 <p class="text-xs font-bold tracking-[0.28em] uppercase mb-6 text-glow-copper">
                     Live system — local inference, no cloud
                 </p>
-                <div class="ss-thumb" style="width: 820px;" onclick="openLightbox()">
+                <div class="ss-thumb" style="width: 820px;" onclick="openLightbox('assets/img/evaa-live.png')">
                     <img src="assets/img/evaa-live.png" alt="EVAA running live"/>
                     <div class="ss-overlay">
                         <div class="ss-overlay-icon">
@@ -569,8 +597,8 @@
                             <div class="flex items-start gap-4">
                                 <div class="step-num ring-copper mt-0.5">1</div>
                                 <div>
-                                    <p class="text-sm font-semibold mb-0.5" style="color: #F8FAFC;">Download the installer</p>
-                                    <p class="text-xs" style="color: #475569;">Single Python script + bundled source. No GitHub dependency at install time.</p>
+                                    <p class="text-sm font-semibold mb-0.5" style="color: #F8FAFC;">Download and unlock the installer</p>
+                                    <p class="text-xs" style="color: #475569;">Password-protected archive — single Python script + bundled source. No GitHub dependency at install time.</p>
                                 </div>
                             </div>
                             <div class="flex items-start gap-4">
@@ -589,10 +617,21 @@
                             </div>
                         </div>
 
-                        <a href="#" class="btn-primary">
-                            <i class="fa-solid fa-download"></i>
-                            Download EVAA Installer
-                        </a>
+                        <div class="flex flex-wrap items-center gap-3 mb-3">
+                            <a href="https://github.com/Umbra-Noesis/eve-systems-releases/releases/latest/download/EVE-Systems-Installer.7z" class="btn-primary">
+                                <i class="fa-solid fa-lock"></i>
+                                Download — Authorized Developers Only
+                            </a>
+                            <a href="javascript:void(0)" class="btn-ghost" onclick="openGallery()">
+                                <i class="fa-solid fa-images"></i>
+                                Preview the System
+                            </a>
+                            <span class="badge-copper" style="font-size:0.62rem;">Pre-Release</span>
+                        </div>
+                        <p class="text-xs" style="color: #475569;">
+                            Builds are password-protected. Request access at
+                            <a href="mailto:umbra-noesis@pm.me" class="text-copper" style="text-decoration:none;">umbra-noesis@pm.me</a>.
+                        </p>
                     </div>
 
                     <!-- Hardware requirements -->
@@ -662,20 +701,87 @@
     <div id="lightbox-close" onclick="closeLightbox()">
         <i class="fa-solid fa-xmark"></i>
     </div>
-    <img src="assets/img/evaa-live.png" alt="EVAA live system" onclick="event.stopPropagation()"/>
+    <img id="lightbox-img" src="assets/img/evaa-live.png" alt="EVE Systems screenshot" onclick="event.stopPropagation()"/>
+</div>
+
+<!-- ══ PREVIEW GALLERY ══════════════════════════════════════════════════ -->
+<div id="gallery">
+    <div id="gallery-close" class="lightbox-close-btn" style="position:fixed; top:1.25rem; right:1.5rem; width:36px; height:36px; border-radius:50%; cursor:pointer; background:rgba(185,115,51,0.12); border:1px solid rgba(185,115,51,0.4); display:flex; align-items:center; justify-content:center; color:#B87333; font-size:1rem; z-index:191;" onclick="closeGallery()">
+        <i class="fa-solid fa-xmark"></i>
+    </div>
+    <div id="gallery-inner">
+        <p class="text-xs font-bold tracking-[0.28em] uppercase mb-2 text-glow-copper">Pre-Release Preview</p>
+        <h2 class="text-2xl sm:text-3xl font-bold mb-2" style="color: #F8FAFC;">The system, as it runs today.</h2>
+        <p class="text-sm mb-2" style="color: #64748B; max-width: 40rem;">
+            Real screenshots, not renders. The installer isn't public yet — this is what's actually running.
+        </p>
+
+        <p class="gallery-group-label text-glow-copper">Running now</p>
+        <div class="gallery-grid">
+            <div class="gallery-thumb" onclick="openLightbox('assets/img/preview/live-01-chat-telemetry.png')">
+                <img src="assets/img/preview/live-01-chat-telemetry.png" alt="Live chat with real-time telemetry sidebar"/>
+            </div>
+            <div class="gallery-thumb" onclick="openLightbox('assets/img/preview/live-02-eye-welcome.png')">
+                <img src="assets/img/preview/live-02-eye-welcome.png" alt="EVE Systems welcome screen"/>
+            </div>
+            <div class="gallery-thumb" onclick="openLightbox('assets/img/preview/live-03-boot-check.png')">
+                <img src="assets/img/preview/live-03-boot-check.png" alt="System boot and readiness check"/>
+            </div>
+            <div class="gallery-thumb" onclick="openLightbox('assets/img/preview/live-04-launch-screen.png')">
+                <img src="assets/img/preview/live-04-launch-screen.png" alt="Application launch screen"/>
+            </div>
+            <div class="gallery-thumb" onclick="openLightbox('assets/img/preview/live-05-model-roster.png')">
+                <img src="assets/img/preview/live-05-model-roster.png" alt="Local model roster and cloud provider status"/>
+            </div>
+            <div class="gallery-thumb" onclick="openLightbox('assets/img/preview/live-06-dashboard.png')">
+                <img src="assets/img/preview/live-06-dashboard.png" alt="Live telemetry dashboard — energy and cost monitoring"/>
+            </div>
+        </div>
+
+        <p class="gallery-group-label text-glow-blue">Building toward</p>
+        <div class="gallery-grid">
+            <div class="gallery-thumb" onclick="openLightbox('assets/img/preview/next-01-data-sources.png')">
+                <img src="assets/img/preview/next-01-data-sources.png" alt="Data source and integration connections"/>
+            </div>
+            <div class="gallery-thumb" onclick="openLightbox('assets/img/preview/next-02-agents.png')">
+                <img src="assets/img/preview/next-02-agents.png" alt="Autonomous agents panel"/>
+            </div>
+            <div class="gallery-thumb" onclick="openLightbox('assets/img/preview/next-03-settings-overview.png')">
+                <img src="assets/img/preview/next-03-settings-overview.png" alt="Settings — assistant, appearance, and connection"/>
+            </div>
+            <div class="gallery-thumb" onclick="openLightbox('assets/img/preview/next-04-memory-tuning.png')">
+                <img src="assets/img/preview/next-04-memory-tuning.png" alt="Memory and model tuning controls"/>
+            </div>
+            <div class="gallery-thumb" onclick="openLightbox('assets/img/preview/next-05-speech-updates.png')">
+                <img src="assets/img/preview/next-05-speech-updates.png" alt="Speech, data, and update settings"/>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-    function openLightbox() {
+    function openLightbox(src) {
+        if (src) document.getElementById('lightbox-img').src = src;
         document.getElementById('lightbox').classList.add('open');
         document.body.style.overflow = 'hidden';
     }
     function closeLightbox() {
         document.getElementById('lightbox').classList.remove('open');
+        document.body.style.overflow = document.getElementById('gallery').classList.contains('open') ? 'hidden' : '';
+    }
+    function openGallery() {
+        document.getElementById('gallery').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeGallery() {
+        document.getElementById('gallery').classList.remove('open');
         document.body.style.overflow = '';
     }
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'Escape') {
+            closeLightbox();
+            closeGallery();
+        }
     });
 </script>
 </body>
